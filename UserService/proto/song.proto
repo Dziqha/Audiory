@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package song;
+
+option go_package = "D:/MicroService/UserService/proto";
+
+service SongService {
+    rpc GetSongById(SongRequest) returns (SongResponse);
+}
+
+service ArtistService {
+    rpc GetArtistById(ArtistRequest) returns (ArtistResponse);
+}
+
+service AlbumService {
+    rpc GetAlbumById(AlbumRequest) returns (AlbumResponse);
+}
+
+message SongRequest {
+    int32 id = 1;
+}
+
+
+message SongResponse {
+    int32 id = 1;
+    string title = 2;
+    int32 artistId = 3;
+    int32 albumId = 4;
+    int32 genreId = 5;
+    int32 duration = 6;
+}
+
+message ArtistRequest {
+    int32 id = 1;
+}
+
+message ArtistResponse {
+    int32 id = 1;
+    string name = 2;
+    int32 debutYear = 3;
+}
+
+message AlbumRequest {
+    int32 id = 1;
+}
+
+message AlbumResponse {
+    int32 id = 1;
+    string title = 2;
+    int32 releaseYear = 3;
+    int32 artistId = 4;
+    int32 genreId = 5;
+}

@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Songs {
+  id          Int      @id @default(autoincrement())
+  title       String
+  releaseDate DateTime @map("release_date")
+  duration    Int
+  artistId    Int      @map("artist_id")
+  genreId     Int      @map("genre_id")
+  albumId     Int      @map("album_id")
+  isPublished Boolean  @map("is_published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  artist Artist @relation(fields: [artistId], references: [id])
+  genre  Genre  @relation(fields: [genreId], references: [id])
+  album  Album  @relation(fields: [albumId], references: [id])
+  
+  playlistSong PlaylistSong[]
+  songCollaborator SongCollaborator[]
+}
+
+model Genre {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String //tanda ? artinya optional
+
+  // Relations
+  songs Songs[]
+  album Album[]
+}
+
+model Artist {
+  id         Int     @id @default(autoincrement())
+  name       String
+  debutYear  Int     @map("debut_year")
+
+  // Relations
+  songs Songs[]
+  album Album[]
+}
+
+model Album {
+  id        Int      @id @default(autoincrement())
+  title     String
+  releaseYear Int    @map("release_year")
+  artistId    Int      @map("artist_id")
+  genreId     Int      @map("genre_id")
+
+  artist   Artist  @relation(fields: [artistId], references: [id])
+  genre    Genre   @relation(fields: [genreId], references: [id])
+  songs   Songs[]
+}
+
+model Playlist {
+  id Int @id @default(autoincrement())
+  name String
+  createdAt DateTime @map("created_at")
+  userId Int @map("user_id")
+
+  playlistSong PlaylistSong[]
+}
+
+model PlaylistSong {
+  id Int @id @default(autoincrement())
+  playlistId Int @map("playlist_id")
+  songId Int @map("song_id")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id])
+  song     Songs @relation(fields: [songId], references: [id])
+}
+
+enum Role {
+  Producer
+  Composer
+  Featured_Artist
+  Lyricist
+  Arranger
+  Instrumentalist
+  Engineer
+}
+
+model Collaborator {
+  id Int @id @default(autoincrement())
+  name String
+  roleType Role @map("role_type")
+
+  songCollaborator SongCollaborator[]
+}
+
+model SongCollaborator {
+  id Int @id @default(autoincrement())
+  songId Int @map("song_id")
+  CollaboratorId Int @map("collaborator_id")
+
+  song     Songs @relation(fields: [songId], references: [id])
+  collaborator    Collaborator @relation(fields: [CollaboratorId], references: [id])
+}
